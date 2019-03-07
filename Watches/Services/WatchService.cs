@@ -22,9 +22,10 @@ namespace Watches.Services
             _dbContext = dbContext;
         }
 
-        public async Task<ResultsPage<Watch>> GetWatchesAsync(int pageNumber, int pageSize)
+        public async Task<ResultsPage<Watch>> GetWatchesAsync(string title, int pageNumber, int pageSize)
         {
             var query = _dbContext.Watches
+                .Where(watch => watch.Title.Contains(title))
                 .Include(watch => watch.Brand);
 
             int total = await query.CountAsync();

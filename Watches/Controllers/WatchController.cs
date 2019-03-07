@@ -27,6 +27,7 @@ namespace Watches.Controllers
 
         [HttpGet]
         public async Task<ActionResult<GetListResponse<WatchDto>>> GetWatchesAsync(
+            [FromQuery] string title = "",
             [FromQuery] int pageNumber = 0,
             [FromQuery] int pageSize = 20)
         {
@@ -39,7 +40,7 @@ namespace Watches.Controllers
                 return BadRequest($"Wrong value for page size: {pageSize}. Page number is expected to be in 1-100 range.");
             }
 
-            var watchesPage = await _watchService.GetWatchesAsync(pageNumber, pageSize);
+            var watchesPage = await _watchService.GetWatchesAsync(title, pageNumber, pageSize);
             return new GetListResponse<WatchDto>
             {
                 PageNumber = watchesPage.PageNumber,
