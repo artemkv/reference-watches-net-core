@@ -10,6 +10,7 @@ using Watches.ViewModels;
 namespace Watches.Controllers
 {
     [Route("api/watches")]
+    [ApiController]
     public class WatchController : Controller
     {
         IWatchService _watchService;

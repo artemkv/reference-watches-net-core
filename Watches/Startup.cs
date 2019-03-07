@@ -30,6 +30,7 @@ namespace Watches
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
             services.AddScoped<IWatchService, WatchService>();
+            services.AddScoped<IBrandService, BrandService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
