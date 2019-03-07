@@ -27,10 +27,29 @@ namespace Watches.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<BrandDto>>> GetBrandsAsync()
+        public async Task<ActionResult<GetListResponse<BrandDto>>> GetBrandsAsync(
+            [FromQuery] int pageNumber = 0,
+            [FromQuery] int pageSize = 20)
         {
-            var brands = await _brandService.GetBrandsAsync();
-            return brands.Select(brand => brand.ToBrandDto()).ToList();
+            if (pageNumber < 0)
+            {
+                return BadRequest($"Wrong value for page number: {pageNumber}. Page number is expected to be greater than 0.");
+            }
+            if (pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest($"Wrong value for page size: {pageSize}. Page number is expected to be in 1-100 range.");
+            }
+
+            var brandsPage = await _brandService.GetBrandsAsync(pageNumber, pageSize);
+
+            return new GetListResponse<BrandDto>
+            {
+                PageNumber = brandsPage.PageNumber,
+                PageSize = brandsPage.PageSize,
+                Total = brandsPage.Total,
+                Count = brandsPage.Count,
+                Results = brandsPage.Results.Select(brand => brand.ToBrandDto()).ToList()
+            };
         }
 
         [HttpGet("{id}")]

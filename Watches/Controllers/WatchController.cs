@@ -26,10 +26,28 @@ namespace Watches.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<WatchDto>>> GetWatchesAsync()
+        public async Task<ActionResult<GetListResponse<WatchDto>>> GetWatchesAsync(
+            [FromQuery] int pageNumber = 0,
+            [FromQuery] int pageSize = 20)
         {
-            var watches = await _watchService.GetWatchesAsync();
-            return watches.Select(watch => watch.ToWatchDto()).ToList();
+            if (pageNumber < 0)
+            {
+                return BadRequest($"Wrong value for page number: {pageNumber}. Page number is expected to be greater than 0.");
+            }
+            if (pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest($"Wrong value for page size: {pageSize}. Page number is expected to be in 1-100 range.");
+            }
+
+            var watchesPage = await _watchService.GetWatchesAsync(pageNumber, pageSize);
+            return new GetListResponse<WatchDto>
+            {
+                PageNumber = watchesPage.PageNumber,
+                PageSize = watchesPage.PageSize,
+                Total = watchesPage.Total,
+                Count = watchesPage.Count,
+                Results = watchesPage.Results.Select(watch => watch.ToWatchDto()).ToList()
+            };
         }
 
         [HttpGet("{id}")]

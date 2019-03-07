@@ -8,7 +8,7 @@ namespace Watches.Services
 {
     public interface IWatchService
     {
-        Task<List<Watch>> GetWatchesAsync();
+        Task<ResultsPage<Watch>> GetWatchesAsync(int pageNumber, int pageSize);
         Task<Watch> GetWatchAsync(long id);
     }
 }

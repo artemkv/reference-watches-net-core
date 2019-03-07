@@ -22,11 +22,26 @@ namespace Watches.Services
             _dbContext = dbContext;
         }
 
-        public Task<List<Watch>> GetWatchesAsync()
+        public async Task<ResultsPage<Watch>> GetWatchesAsync(int pageNumber, int pageSize)
         {
-            return _dbContext.Watches
-                .Include(watch => watch.Brand)
+            var query = _dbContext.Watches
+                .Include(watch => watch.Brand);
+
+            int total = await query.CountAsync();
+
+            var results = await query
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return new ResultsPage<Watch>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Total = total,
+                Count = results.Count,
+                Results = results
+            };
         }
 
         public async Task<Watch> GetWatchAsync(long id)

@@ -8,7 +8,7 @@ namespace Watches.Services
 {
     public interface IBrandService
     {
-        Task<List<Brand>> GetBrandsAsync();
+        Task<ResultsPage<Brand>> GetBrandsAsync(int pageNumber, int pageSize);
         Task<Brand> GetBrandAsync(long id);
     }
 }
