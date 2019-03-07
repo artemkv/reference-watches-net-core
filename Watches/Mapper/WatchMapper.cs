@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Watches.Models;
+using Watches.ViewModels;
+
+namespace Watches.Mapper
+{
+    public static class WatchMapper
+    {
+        public static WatchDto ToWatchDto(this Watch watch)
+        {
+            if (watch == null)
+            {
+                return null;
+            }
+
+            return new WatchDto
+            {
+                Id = watch.Id,
+                Model = watch.Model,
+                Title = watch.Title,
+                Gender = watch.Gender,
+                CaseSize = watch.CaseSize,
+                CaseMaterial = watch.CaseMaterial,
+                DateCreated = watch.DateCreated,
+                Brand = watch.Brand.ToBrandDto(),
+                MovementId = watch.MovementId
+            };
+        }
+    }
+}
