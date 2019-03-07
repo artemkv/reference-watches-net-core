@@ -22,11 +22,25 @@ namespace Watches.Services
             _dbContext = dbContext;
         }
 
-        public Task<List<Watch>> GetWatches()
+        public Task<List<Watch>> GetWatchesAsync()
         {
             return _dbContext.Watches
                 .Include(watch => watch.Brand)
                 .ToListAsync();
+        }
+
+        public async Task<Watch> GetWatchAsync(long id)
+        {
+            var watch = await _dbContext.Watches
+                .FindAsync(id);
+
+            if (watch == null)
+            {
+                return null;
+            }
+
+            await _dbContext.Entry(watch).Reference(x => x.Brand).LoadAsync();
+            return watch;
         }
     }
 }
