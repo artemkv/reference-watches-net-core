@@ -66,6 +66,22 @@ namespace Watches.Controllers
             return CreatedAtAction(nameof(GetBrandAsync), new { id = created.Id }, created.ToBrandDto());
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBrandAsync(long id, BrandToPutDto brand)
+        {
+            if (id != brand.Id)
+            {
+                throw new BadRequestException($"Brand id {brand.Id} does not match the id in the route: {id}.", "id");
+            }
+
+            var updated = await _brandService.UpdateBrandAsync(brand.Id, brand.Title, brand.YearFounded, brand.Description);
+            if (!updated)
+            {
+                return NotFound($"Brand with id {id} cannot be found.");
+            }
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBrandAsync(long id)
         {

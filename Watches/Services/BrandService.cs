@@ -56,7 +56,7 @@ namespace Watches.Services
             return brand;
         }
 
-        public async Task<bool> DeleteBrandAsync(long id)
+        public async Task<bool> UpdateBrandAsync(long id, string title, int yearFounded, string description)
         {
             var brand = await _dbContext.Brands
                 .FindAsync(id);
@@ -66,6 +66,23 @@ namespace Watches.Services
                 return false;
             }
 
+            brand.Title = title;
+            brand.YearFounded = yearFounded;
+            brand.Description = description;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteBrandAsync(long id)
+        {
+            var brand = await _dbContext.Brands
+                .FindAsync(id);
+
+            if (brand == null)
+            {
+                return false;
+            }
 
             _dbContext.Brands.Remove(brand);
             await _dbContext.SaveChangesAsync();
