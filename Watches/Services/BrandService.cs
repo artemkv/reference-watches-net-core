@@ -49,6 +49,13 @@ namespace Watches.Services
                 .FindAsync(id);
         }
 
+        public async Task<Brand> CreateBrandAsync(Brand brand)
+        {
+            await _dbContext.Brands.AddAsync(brand);
+            await _dbContext.SaveChangesAsync();
+            return brand;
+        }
+
         public async Task<bool> DeleteBrandAsync(long id)
         {
             var brand = await _dbContext.Brands

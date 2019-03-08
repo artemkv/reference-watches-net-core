@@ -10,6 +10,7 @@ namespace Watches.Services
     {
         Task<ResultsPage<Brand>> GetBrandsAsync(int pageNumber, int pageSize);
         Task<Brand> GetBrandAsync(long id);
+        Task<Brand> CreateBrandAsync(Brand brand);
         Task<bool> DeleteBrandAsync(long id);
     }
 }

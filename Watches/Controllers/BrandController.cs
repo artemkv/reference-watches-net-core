@@ -59,6 +59,13 @@ namespace Watches.Controllers
             return brand.ToBrandDto();
         }
 
+        [HttpPost]
+        public async Task<ActionResult<BrandDto>> CreateBrandAsync(BrandToPostDto brand)
+        {
+            var created = await _brandService.CreateBrandAsync(brand.ToBrand());
+            return CreatedAtAction(nameof(GetBrandAsync), new { id = created.Id }, created.ToBrandDto());
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBrandAsync(long id)
         {
