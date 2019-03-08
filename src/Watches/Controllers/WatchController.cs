@@ -41,12 +41,17 @@ namespace Watches.Controllers
             [FromQuery] Gender? gender = null,
             [FromQuery] long? brandId = null,
             [FromQuery] int pageNumber = 0,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int? pageSize = null)
         {
-            PagingValidationHelper.ValidatePageNumber(pageNumber);
-            PagingValidationHelper.ValidatePageSize(pageSize, _config.ApiPageSizeLimit);
+            if (pageSize == null)
+            {
+                pageSize = _config.ApiDefaultPageSize;
+            }
 
-            var watchesPage = await _watchService.GetWatchesAsync(title, gender, brandId, pageNumber, pageSize);
+            PagingValidationHelper.ValidatePageNumber(pageNumber);
+            PagingValidationHelper.ValidatePageSize((int)pageSize, _config.ApiPageSizeLimit);
+
+            var watchesPage = await _watchService.GetWatchesAsync(title, gender, brandId, pageNumber, (int)pageSize);
             return new GetListResponse<WatchDto>
             {
                 PageNumber = watchesPage.PageNumber,

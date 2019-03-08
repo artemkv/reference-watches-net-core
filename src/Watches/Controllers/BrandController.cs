@@ -37,12 +37,17 @@ namespace Watches.Controllers
         [HttpGet]
         public async Task<ActionResult<GetListResponse<BrandDto>>> GetBrandsAsync(
             [FromQuery] int pageNumber = 0,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int? pageSize = null)
         {
-            PagingValidationHelper.ValidatePageNumber(pageNumber);
-            PagingValidationHelper.ValidatePageSize(pageSize, _config.ApiPageSizeLimit);
+            if (pageSize == null)
+            {
+                pageSize = _config.ApiDefaultPageSize;
+            }
 
-            var brandsPage = await _brandService.GetBrandsAsync(pageNumber, pageSize);
+            PagingValidationHelper.ValidatePageNumber(pageNumber);
+            PagingValidationHelper.ValidatePageSize((int)pageSize, _config.ApiPageSizeLimit);
+
+            var brandsPage = await _brandService.GetBrandsAsync(pageNumber, (int)pageSize);
 
             return new GetListResponse<BrandDto>
             {

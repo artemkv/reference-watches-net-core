@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Watches.Controllers;
 using Watches.Models;
@@ -17,8 +18,10 @@ namespace Watches.Tests
         {
             // Arrange
             var today = DateTime.UtcNow;
+            var expected = GetSingleWatch(today);
+
             var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.GetWatchAsync(5)).ReturnsAsync(GetSingleWatch(today));
+            mockWatchService.Setup(svc => svc.GetWatchAsync(5)).ReturnsAsync(expected);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
 
@@ -28,19 +31,19 @@ namespace Watches.Tests
             // Assert
             var actionResult = Assert.IsType<ActionResult<WatchDto>>(response);
             var model = Assert.IsAssignableFrom<WatchDto>(actionResult.Value);
-            Assert.Equal(5, model.Id);
-            Assert.Equal("114060", model.Model);
-            Assert.Equal("Submariner", model.Title);
-            Assert.Equal(Gender.Mens, model.Gender);
-            Assert.Equal(40, model.CaseSize);
-            Assert.Equal(CaseMaterial.StainlessSteel, model.CaseMaterial);
-            Assert.Equal(today, model.DateCreated);
-            Assert.Equal(4, model.Brand.Id);
-            Assert.Equal("Rolex", model.Brand.Title);
-            Assert.Equal(1915, model.Brand.YearFounded);
-            Assert.Equal("Swiss luxury watch manufacturer", model.Brand.Description);
-            Assert.Equal(today, model.Brand.DateCreated);
-            Assert.Equal(2, model.MovementId);
+            Assert.Equal(expected.Id, model.Id);
+            Assert.Equal(expected.Model, model.Model);
+            Assert.Equal(expected.Title, model.Title);
+            Assert.Equal(expected.Gender, model.Gender);
+            Assert.Equal(expected.CaseSize, model.CaseSize);
+            Assert.Equal(expected.CaseMaterial, model.CaseMaterial);
+            Assert.Equal(expected.DateCreated, model.DateCreated);
+            Assert.Equal(expected.Brand.Id, model.Brand.Id);
+            Assert.Equal(expected.Brand.Title, model.Brand.Title);
+            Assert.Equal(expected.Brand.YearFounded, model.Brand.YearFounded);
+            Assert.Equal(expected.Brand.Description, model.Brand.Description);
+            Assert.Equal(expected.Brand.DateCreated, model.Brand.DateCreated);
+            Assert.Equal(expected.MovementId, model.MovementId);
         }
 
         [Fact]
@@ -58,6 +61,32 @@ namespace Watches.Tests
             // Assert
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response.Result);
             Assert.Equal("Watch with id 55 cannot be found.", notFoundObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task GetWatches_CallsWatchServiceWithDefaultValues()
+        {
+            // Arrange
+            var expected = GetWatches();
+
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.GetWatchesAsync("", null, null, 0, 20)).ReturnsAsync(expected);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(100);
+            mockApiConfiguration.Setup(config => config.ApiDefaultPageSize).Returns(20);
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.GetWatchesAsync();
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<GetListResponse<WatchDto>>>(response);
+            var listResponse = Assert.IsAssignableFrom<GetListResponse<WatchDto>>(actionResult.Value);
+            Assert.Equal(expected.Total, listResponse.Total);
+            Assert.Equal(expected.Count, listResponse.Count);
+            Assert.Equal(expected.PageNumber, listResponse.PageNumber);
+            Assert.Equal(expected.PageSize, listResponse.PageSize);
+            Assert.Equal(expected.Results.Count, listResponse.Results.Count);
         }
 
         private Watch GetSingleWatch(DateTime date)
@@ -85,6 +114,28 @@ namespace Watches.Tests
                 {
                     Id = 2,
                     Title = "Automatic"
+                }
+            };
+        }
+
+        private ResultsPage<Watch> GetWatches()
+        {
+            return new ResultsPage<Watch>
+            {
+                Total = 2,
+                Count = 2,
+                PageNumber = 0,
+                PageSize = 20,
+                Results = new List<Watch>()
+                {
+                    new Watch
+                    {
+                        Id = 5
+                    },
+                    new Watch
+                    {
+                        Id = 6
+                    }
                 }
             };
         }

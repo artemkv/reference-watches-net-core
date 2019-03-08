@@ -8,5 +8,6 @@ namespace Watches
     public interface IApiConfiguration
     {
         int ApiPageSizeLimit { get; }
+        int ApiDefaultPageSize { get; }
     }
 }

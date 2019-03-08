@@ -22,7 +22,7 @@ namespace Watches.Controllers.Helpers
             if (pageSize < 1 || pageSize > pageSizeLimit)
             {
                 throw new BadRequestException(
-                    $"Wrong value for page size: {pageSize}. Page number is expected to be in 1-{pageSizeLimit} range.", "pageSize");
+                    $"Wrong value for page size: {pageSize}. Page size is expected to be in 1-{pageSizeLimit} range.", "pageSize");
             }
         }
     }
