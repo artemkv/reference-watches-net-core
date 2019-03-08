@@ -60,6 +60,7 @@ namespace Watches.Tests
             var response = await controller.GetWatchAsync(55);
 
             // Assert
+            var result = Assert.IsType<ActionResult<WatchDto>>(response);
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response.Result);
             Assert.Equal("Watch with id 55 cannot be found.", notFoundObjectResult.Value);
         }
@@ -174,6 +175,7 @@ namespace Watches.Tests
             var response = await controller.CreateWatchAsync(watchToPost);
 
             // Assert
+            var result = Assert.IsType<ActionResult<WatchDto>>(response);
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(response.Result);
             var model = Assert.IsAssignableFrom<WatchDto>(createdAtActionResult.Value);
             Assert.Equal(watchPosted.Id, model.Id);
@@ -208,7 +210,8 @@ namespace Watches.Tests
             var mockWatchService = new Mock<IWatchService>();
             mockWatchService.Setup(svc => svc.UpdateWatchAsync(
                 watchToPut.Id, watchToPut.Model, watchToPut.Title, watchToPut.Gender, watchToPut.CaseSize,
-                watchToPut.CaseMaterial, watchToPut.BrandId, watchToPut.MovementId)).ReturnsAsync(false);
+                watchToPut.CaseMaterial, watchToPut.BrandId, watchToPut.MovementId))
+                .ReturnsAsync(false).Verifiable();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
 
@@ -216,6 +219,7 @@ namespace Watches.Tests
             var response = await controller.UpdateWatchAsync(watchToPut.Id, watchToPut);
 
             // Assert
+            mockWatchService.Verify();
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
             Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
         }
@@ -259,7 +263,7 @@ namespace Watches.Tests
         {
             // Arrange
             var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(false);
+            mockWatchService.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(false).Verifiable();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
 
@@ -267,6 +271,7 @@ namespace Watches.Tests
             var response = await controller.DeleteWatchAsync(15);
 
             // Assert
+            mockWatchService.Verify();
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
             Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
         }
