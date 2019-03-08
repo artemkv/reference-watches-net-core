@@ -16,16 +16,22 @@ namespace Watches.Controllers
     [ApiController]
     public class BrandController : ControllerBase
     {
-        IBrandService _brandService;
+        private IBrandService _brandService;
+        private IApiConfiguration _config;
 
-        public BrandController(IBrandService brandService)
+        public BrandController(IBrandService brandService, IApiConfiguration config)
         {
             if (brandService == null)
             {
                 throw new ArgumentNullException("brandService");
             }
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
 
             _brandService = brandService;
+            _config = config;
         }
 
         [HttpGet]
@@ -34,7 +40,7 @@ namespace Watches.Controllers
             [FromQuery] int pageSize = 20)
         {
             PagingValidationHelper.ValidatePageNumber(pageNumber);
-            PagingValidationHelper.ValidatePageSize(pageSize);
+            PagingValidationHelper.ValidatePageSize(pageSize, _config.ApiPageSizeLimit);
 
             var brandsPage = await _brandService.GetBrandsAsync(pageNumber, pageSize);
 

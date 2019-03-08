@@ -17,12 +17,12 @@ namespace Watches.Controllers.Helpers
             }
         }
 
-        public static void ValidatePageSize(int pageSize)
+        public static void ValidatePageSize(int pageSize, int pageSizeLimit)
         {
-            if (pageSize < 1 || pageSize > 100)
+            if (pageSize < 1 || pageSize > pageSizeLimit)
             {
                 throw new BadRequestException(
-                    $"Wrong value for page size: {pageSize}. Page number is expected to be in 1-100 range.", "pageSize");
+                    $"Wrong value for page size: {pageSize}. Page number is expected to be in 1-{pageSizeLimit} range.", "pageSize");
             }
         }
     }

@@ -35,6 +35,7 @@ namespace Watches
             }).AddXmlSerializerFormatters(); // Allows Xml formatting as well as Json, using content negotiation
             services.AddScoped<IWatchService, WatchService>();
             services.AddScoped<IBrandService, BrandService>();
+            services.AddScoped<IApiConfiguration, ApiConfiguration>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

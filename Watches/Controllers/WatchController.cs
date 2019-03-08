@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
@@ -16,16 +17,22 @@ namespace Watches.Controllers
     [ApiController]
     public class WatchController : Controller
     {
-        IWatchService _watchService;
+        private IWatchService _watchService;
+        private IApiConfiguration _config;
 
-        public WatchController(IWatchService watchService)
+        public WatchController(IWatchService watchService, IApiConfiguration config)
         {
             if (watchService == null)
             {
                 throw new ArgumentNullException("watchService");
             }
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
 
             _watchService = watchService;
+            _config = config;
         }
 
         [HttpGet]
@@ -37,7 +44,7 @@ namespace Watches.Controllers
             [FromQuery] int pageSize = 20)
         {
             PagingValidationHelper.ValidatePageNumber(pageNumber);
-            PagingValidationHelper.ValidatePageSize(pageSize);
+            PagingValidationHelper.ValidatePageSize(pageSize, _config.ApiPageSizeLimit);
 
             var watchesPage = await _watchService.GetWatchesAsync(title, gender, brandId, pageNumber, pageSize);
             return new GetListResponse<WatchDto>
