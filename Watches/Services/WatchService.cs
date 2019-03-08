@@ -61,5 +61,29 @@ namespace Watches.Services
             await _dbContext.Entry(watch).Reference(x => x.Brand).LoadAsync();
             return watch;
         }
+
+        public async Task<Watch> CreateWatchAsync(Watch watch)
+        {
+            await _dbContext.Watches.AddAsync(watch);
+            await _dbContext.SaveChangesAsync();
+            await _dbContext.Entry(watch).Reference(x => x.Brand).LoadAsync();
+            return watch;
+        }
+
+        public async Task<bool> DeleteWatchAsync(long id)
+        {
+            var watch = await _dbContext.Watches
+                .FindAsync(id);
+
+            if (watch == null)
+            {
+                return false;
+            }
+
+
+            _dbContext.Watches.Remove(watch);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

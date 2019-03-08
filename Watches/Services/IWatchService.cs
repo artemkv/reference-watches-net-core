@@ -11,5 +11,7 @@ namespace Watches.Services
         Task<ResultsPage<Watch>> GetWatchesAsync(
             string title, Gender? gender, long? brandId, int pageNumber, int pageSize);
         Task<Watch> GetWatchAsync(long id);
+        Task<Watch> CreateWatchAsync(Watch watch);
+        Task<bool> DeleteWatchAsync(long id);
     }
 }

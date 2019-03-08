@@ -60,5 +60,23 @@ namespace Watches.Controllers
             }
             return watch.ToWatchDto();
         }
+
+        [HttpPost]
+        public async Task<ActionResult<WatchDto>> CreateWatchAsync(WatchToPostDto watch)
+        {
+            var created = await _watchService.CreateWatchAsync(watch.ToWatch());
+            return CreatedAtAction(nameof(GetWatchAsync), new { id = created.Id }, created.ToWatchDto());
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteWatchAsync(long id)
+        {
+            var removed = await _watchService.DeleteWatchAsync(id);
+            if (!removed)
+            {
+                return NotFound($"Watch with id {id} cannot be found.");
+            }
+            return NoContent();
+        }
     }
 }

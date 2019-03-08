@@ -29,5 +29,25 @@ namespace Watches.Mapper
                 MovementId = watch.MovementId
             };
         }
+
+        public static Watch ToWatch(this WatchToPostDto watch)
+        {
+            if (watch == null)
+            {
+                return null;
+            }
+
+            return new Watch
+            {
+                Model = watch.Model,
+                Title = watch.Title,
+                Gender = watch.Gender,
+                CaseSize = watch.CaseSize,
+                CaseMaterial = watch.CaseMaterial,
+                DateCreated = DateTime.UtcNow,
+                BrandId = watch.BrandId,
+                MovementId = watch.MovementId
+            };
+        }
     }
 }
