@@ -15,7 +15,7 @@ namespace Watches.Tests
     public class WatchControllerTests
     {
         [Fact]
-        public async Task GetWatch_CallsWatchServiceWithId()
+        public async Task GetWatch_ReturnsWatch()
         {
             // Arrange
             var today = DateTime.UtcNow;
@@ -150,6 +150,127 @@ namespace Watches.Tests
             Assert.Equal("Wrong value for page size: 11. Page size is expected to be in 1-10 range.", ex.Message);
         }
 
+        [Fact]
+        public async Task CreateWatch_CreatesWatchAndReturnsNewWatch()
+        {
+            // Arrange
+            var watchToPost = GetWatchToPost();
+            var watchPosted = GetWatchPosted();
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.CreateWatchAsync(
+                It.Is<Watch>(
+                    x => x.Id == 0 && 
+                    x.Model.Equals(watchToPost.Model) &&
+                    x.Title.Equals(watchToPost.Title) &&
+                    x.Gender.Equals(watchToPost.Gender) &&
+                    x.CaseSize.Equals(watchToPost.CaseSize) &&
+                    x.CaseMaterial.Equals(watchToPost.CaseMaterial) &&
+                    x.BrandId.Equals(watchToPost.BrandId) &&
+                    x.MovementId.Equals(watchToPost.MovementId)))).ReturnsAsync(watchPosted);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.CreateWatchAsync(watchToPost);
+
+            // Assert
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(response.Result);
+            var model = Assert.IsAssignableFrom<WatchDto>(createdAtActionResult.Value);
+            Assert.Equal(watchPosted.Id, model.Id);
+            Assert.Equal(watchPosted.Model, model.Model);
+            Assert.Equal(watchPosted.Title, model.Title);
+        }
+
+        [Fact]
+        public async Task UpdateWatch_UpdatesWatch()
+        {
+            // Arrange
+            var watchToPut = GetWatchToPut();
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.UpdateWatchAsync(
+                watchToPut.Id, watchToPut.Model, watchToPut.Title, watchToPut.Gender, watchToPut.CaseSize,
+                watchToPut.CaseMaterial, watchToPut.BrandId, watchToPut.MovementId)).ReturnsAsync(true);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.UpdateWatchAsync(watchToPut.Id, watchToPut);
+
+            // Assert
+            Assert.IsType<NoContentResult>(response);
+        }
+
+        [Fact]
+        public async Task UpdateWatch_ReturnsNotFound_ForInvalidId()
+        {
+            // Arrange
+            var watchToPut = GetWatchToPut();
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.UpdateWatchAsync(
+                watchToPut.Id, watchToPut.Model, watchToPut.Title, watchToPut.Gender, watchToPut.CaseSize,
+                watchToPut.CaseMaterial, watchToPut.BrandId, watchToPut.MovementId)).ReturnsAsync(false);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.UpdateWatchAsync(watchToPut.Id, watchToPut);
+
+            // Assert
+            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
+            Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateWatch_ThrowsBadRequest_ForMismatchingIds()
+        {
+            // Arrange
+            var watchToPut = GetWatchToPut();
+            var mockWatchService = new Mock<IWatchService>();
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var ex = await Assert.ThrowsAsync<BadRequestException>(
+                () => controller.UpdateWatchAsync(10, watchToPut));
+
+            // Assert
+            Assert.Equal("id", ex.Key);
+            Assert.Equal("Watch id 15 does not match the id in the route: 10.", ex.Message);
+        }
+
+        [Fact]
+        public async Task DeleteWatch_DeletesWatch()
+        {
+            // Arrange
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(true);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.DeleteWatchAsync(15);
+
+            // Assert
+            Assert.IsType<NoContentResult>(response);
+        }
+
+        [Fact]
+        public async Task DeleteWatch_ReturnsNotFound_ForInvalidId()
+        {
+            // Arrange
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(false);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.DeleteWatchAsync(15);
+
+            // Assert
+            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
+            Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
+        }
+
         private Watch GetSingleWatch(DateTime date)
         {
             return new Watch
@@ -198,6 +319,64 @@ namespace Watches.Tests
                         Id = 6
                     }
                 }
+            };
+        }
+
+        private WatchToPostDto GetWatchToPost()
+        {
+            return new WatchToPostDto
+            {
+                Model = "15450BA.OO.1256BA.01",
+                Title = "Royal Oak",
+                Gender = Gender.Ladies,
+                CaseSize = 37,
+                CaseMaterial = CaseMaterial.Gold,
+                BrandId = 8,
+                MovementId = 2
+            };
+        }
+
+        private Watch GetWatchPosted()
+        {
+            return new Watch
+            {
+                Id = 15,
+                Model = "15450BA.OO.1256BA.01",
+                Title = "Royal Oak",
+                Gender = Gender.Ladies,
+                CaseSize = 37,
+                CaseMaterial = CaseMaterial.Gold,
+                DateCreated = DateTime.UtcNow,
+                BrandId = 8,
+                Brand = new Brand
+                {
+                    Id = 8,
+                    Title = "Audemars Piguet",
+                    YearFounded = 1875,
+                    Description = "Swiss manufacturer of luxury mechanical watches and clocks",
+                    DateCreated = DateTime.UtcNow
+                },
+                MovementId = 2,
+                Movement = new Movement
+                {
+                    Id = 2,
+                    Title = "Automatic"
+                }
+            };
+        }
+
+        private WatchToPutDto GetWatchToPut()
+        {
+            return new WatchToPutDto
+            {
+                Id = 15,
+                Model = "15450BA.OO.1256BA.01",
+                Title = "Royal Oak",
+                Gender = Gender.Ladies,
+                CaseSize = 37,
+                CaseMaterial = CaseMaterial.Gold,
+                BrandId = 8,
+                MovementId = 2
             };
         }
     }

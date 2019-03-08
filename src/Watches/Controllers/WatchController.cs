@@ -93,7 +93,7 @@ namespace Watches.Controllers
                 watch.CaseMaterial, watch.BrandId, watch.MovementId);
             if (!updated)
             {
-                return NotFound($"Brand with id {id} cannot be found.");
+                return NotFound($"Watch with id {id} cannot be found.");
             }
             return NoContent();
         }
