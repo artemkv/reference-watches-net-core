@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Watches.Controllers;
+using Watches.Exceptions;
 using Watches.Models;
 using Watches.Services;
 using Watches.ViewModels;
@@ -47,7 +48,7 @@ namespace Watches.Tests
         }
 
         [Fact]
-        public async Task GetWatch_ReturnsNotFount_ForInvalidId()
+        public async Task GetWatch_ReturnsNotFound_ForInvalidId()
         {
             // Arrange
             var mockWatchService = new Mock<IWatchService>();
@@ -87,6 +88,47 @@ namespace Watches.Tests
             Assert.Equal(expected.PageNumber, listResponse.PageNumber);
             Assert.Equal(expected.PageSize, listResponse.PageSize);
             Assert.Equal(expected.Results.Count, listResponse.Results.Count);
+        }
+
+        [Fact]
+        public async Task GetWatches_CallsWatchServiceWithCorrectFilters()
+        {
+            // Arrange
+            var expected = GetWatches();
+
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80)).ReturnsAsync(expected);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(100);
+            mockApiConfiguration.Setup(config => config.ApiDefaultPageSize).Returns(20);
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<GetListResponse<WatchDto>>>(response);
+            var listResponse = Assert.IsAssignableFrom<GetListResponse<WatchDto>>(actionResult.Value);
+            Assert.Equal(expected.Total, listResponse.Total);
+            Assert.Equal(expected.Count, listResponse.Count);
+            Assert.Equal(expected.PageNumber, listResponse.PageNumber);
+            Assert.Equal(expected.PageSize, listResponse.PageSize);
+            Assert.Equal(expected.Results.Count, listResponse.Results.Count);
+        }
+
+        [Fact]
+        public async Task GetWatches_ThrowsBadRequest_ForInvalidPageNumber()
+        {
+            // Arrange
+            var mockWatchService = new Mock<IWatchService>();
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(10);
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var ex = await Assert.ThrowsAsync<BadRequestException>(() => controller.GetWatchesAsync(pageNumber: -1));
+            Assert.Equal("pageNumber", ex.Key);
+            Assert.Equal("Wrong value for page number: -1. Page number is expected to be greater than 0.", ex.Message);
         }
 
         private Watch GetSingleWatch(DateTime date)
