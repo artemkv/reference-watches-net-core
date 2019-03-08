@@ -58,5 +58,16 @@ namespace Watches.Controllers
             }
             return brand.ToBrandDto();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBrandAsync(long id)
+        {
+            var removed = await _brandService.DeleteBrandAsync(id);
+            if (!removed)
+            {
+                return NotFound($"Brand with id {id} cannot be found.");
+            }
+            return NoContent();
+        }
     }
 }

@@ -48,5 +48,21 @@ namespace Watches.Services
             return _dbContext.Brands
                 .FindAsync(id);
         }
+
+        public async Task<bool> DeleteBrandAsync(long id)
+        {
+            var brand = await _dbContext.Brands
+                .FindAsync(id);
+
+            if (brand == null)
+            {
+                return false;
+            }
+
+
+            _dbContext.Brands.Remove(brand);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }
