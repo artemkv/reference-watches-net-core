@@ -22,10 +22,13 @@ namespace Watches.Services
             _dbContext = dbContext;
         }
 
-        public async Task<ResultsPage<Watch>> GetWatchesAsync(string title, int pageNumber, int pageSize)
+        public async Task<ResultsPage<Watch>> GetWatchesAsync(
+            string title, Gender? gender, long? brandId, int pageNumber, int pageSize)
         {
             var query = _dbContext.Watches
-                .Where(watch => watch.Title.Contains(title))
+                .Where(watch => String.IsNullOrEmpty(title) || watch.Title.Contains(title))
+                .Where(watch => gender == null || watch.Gender == gender)
+                .Where(watch => brandId == null || watch.BrandId == brandId)
                 .Include(watch => watch.Brand);
 
             int total = await query.CountAsync();

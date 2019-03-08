@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
+using Watches.Models;
 using Watches.Services;
 using Watches.ViewModels;
 
@@ -30,13 +31,15 @@ namespace Watches.Controllers
         [HttpGet]
         public async Task<ActionResult<GetListResponse<WatchDto>>> GetWatchesAsync(
             [FromQuery] string title = "",
+            [FromQuery] Gender? gender = null,
+            [FromQuery] long? brandId = null,
             [FromQuery] int pageNumber = 0,
             [FromQuery] int pageSize = 20)
         {
             PagingValidationHelper.ValidatePageNumber(pageNumber);
             PagingValidationHelper.ValidatePageSize(pageSize);
 
-            var watchesPage = await _watchService.GetWatchesAsync(title, pageNumber, pageSize);
+            var watchesPage = await _watchService.GetWatchesAsync(title, gender, brandId, pageNumber, pageSize);
             return new GetListResponse<WatchDto>
             {
                 PageNumber = watchesPage.PageNumber,
