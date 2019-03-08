@@ -127,8 +127,27 @@ namespace Watches.Tests
 
             // Act
             var ex = await Assert.ThrowsAsync<BadRequestException>(() => controller.GetWatchesAsync(pageNumber: -1));
+
+            // Assert
             Assert.Equal("pageNumber", ex.Key);
             Assert.Equal("Wrong value for page number: -1. Page number is expected to be greater than 0.", ex.Message);
+        }
+
+        [Fact]
+        public async Task GetWatches_ThrowsBadRequest_ForInvalidPageSize()
+        {
+            // Arrange
+            var mockWatchService = new Mock<IWatchService>();
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(10);
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var ex = await Assert.ThrowsAsync<BadRequestException>(() => controller.GetWatchesAsync(pageSize: 11));
+
+            // Assert
+            Assert.Equal("pageSize", ex.Key);
+            Assert.Equal("Wrong value for page size: 11. Page size is expected to be in 1-10 range.", ex.Message);
         }
 
         private Watch GetSingleWatch(DateTime date)
