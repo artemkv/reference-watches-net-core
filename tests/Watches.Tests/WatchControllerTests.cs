@@ -23,10 +23,10 @@ namespace Watches.Tests
             var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
 
             // Act
-            var result = await controller.GetWatchAsync(5);
+            var response = await controller.GetWatchAsync(5);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<WatchDto>>(result);
+            var actionResult = Assert.IsType<ActionResult<WatchDto>>(response);
             var model = Assert.IsAssignableFrom<WatchDto>(actionResult.Value);
             Assert.Equal(5, model.Id);
             Assert.Equal("114060", model.Model);
@@ -41,6 +41,23 @@ namespace Watches.Tests
             Assert.Equal("Swiss luxury watch manufacturer", model.Brand.Description);
             Assert.Equal(today, model.Brand.DateCreated);
             Assert.Equal(2, model.MovementId);
+        }
+
+        [Fact]
+        public async Task GetWatch_ReturnsNotFount_ForInvalidId()
+        {
+            // Arrange
+            var mockWatchService = new Mock<IWatchService>();
+            mockWatchService.Setup(svc => svc.GetWatchAsync(55)).ReturnsAsync((Watch)null);
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var response = await controller.GetWatchAsync(55);
+
+            // Assert
+            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response.Result);
+            Assert.Equal("Watch with id 55 cannot be found.", notFoundObjectResult.Value);
         }
 
         private Watch GetSingleWatch(DateTime date)
