@@ -29,7 +29,10 @@ namespace Watches
         {
             services.AddDbContext<WatchesDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(BadRequestExceptionFilter));
+            }).AddXmlSerializerFormatters(); // Allows Xml formatting as well as Json, using content negotiation
             services.AddScoped<IWatchService, WatchService>();
             services.AddScoped<IBrandService, BrandService>();
         }

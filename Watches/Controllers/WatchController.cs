@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Watches.Controllers.Helpers;
+using Watches.Exceptions;
 using Watches.Mapper;
 using Watches.Services;
 using Watches.ViewModels;
@@ -31,14 +33,8 @@ namespace Watches.Controllers
             [FromQuery] int pageNumber = 0,
             [FromQuery] int pageSize = 20)
         {
-            if (pageNumber < 0)
-            {
-                return BadRequest($"Wrong value for page number: {pageNumber}. Page number is expected to be greater than 0.");
-            }
-            if (pageSize < 1 || pageSize > 100)
-            {
-                return BadRequest($"Wrong value for page size: {pageSize}. Page number is expected to be in 1-100 range.");
-            }
+            PagingValidationHelper.ValidatePageNumber(pageNumber);
+            PagingValidationHelper.ValidatePageSize(pageSize);
 
             var watchesPage = await _watchService.GetWatchesAsync(title, pageNumber, pageSize);
             return new GetListResponse<WatchDto>
@@ -52,17 +48,12 @@ namespace Watches.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<WatchDto>> GetWatchAsync(string id)
+        public async Task<ActionResult<WatchDto>> GetWatchAsync(long id)
         {
-            long idParsed;
-            if (!long.TryParse(id, out idParsed)) {
-                return BadRequest($"Incorrect value for id: '{id}'.");
-            }
-
-            var watch = await _watchService.GetWatchAsync(idParsed);
+            var watch = await _watchService.GetWatchAsync(id);
             if (watch == null)
             {
-                return NotFound($"Watch with id {idParsed} cannot be found.");
+                return NotFound($"Watch with id {id} cannot be found.");
             }
             return watch.ToWatchDto();
         }
