@@ -36,6 +36,7 @@ namespace Watches.Services
             var results = await query
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
+                .OrderBy(watch => watch.Id)
                 .ToListAsync();
 
             return new ResultsPage<Watch>
