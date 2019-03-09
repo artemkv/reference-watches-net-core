@@ -23,13 +23,6 @@ namespace Watches
                 {
                     config.AddEnvironmentVariables(prefix: "WATCHES_");
                 })
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    logging.AddDebug();
-                    logging.AddEventSourceLogger();
-                })
                 .UseStartup<Startup>();
     }
 }
