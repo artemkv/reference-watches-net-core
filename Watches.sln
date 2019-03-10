@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Watches", "src\Watches\Watc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Watches.Tests", "tests\Watches.Tests\Watches.Tests.csproj", "{19FE85CD-0F42-491A-AA75-0924561F7454}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watches.IntegrationTests", "tests\Watches.IntegrationTests\Watches.IntegrationTests.csproj", "{6159455D-2D12-4FA3-B5B1-F10E80E60747}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{19FE85CD-0F42-491A-AA75-0924561F7454}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19FE85CD-0F42-491A-AA75-0924561F7454}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19FE85CD-0F42-491A-AA75-0924561F7454}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6159455D-2D12-4FA3-B5B1-F10E80E60747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6159455D-2D12-4FA3-B5B1-F10E80E60747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6159455D-2D12-4FA3-B5B1-F10E80E60747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6159455D-2D12-4FA3-B5B1-F10E80E60747}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{660F3EF2-54A6-4594-8C74-227B17BD8147} = {73A2BE5C-7C32-47AD-B821-C8C19EA232A2}
 		{19FE85CD-0F42-491A-AA75-0924561F7454} = {BE890223-2D43-41C5-9657-497769E167CB}
+		{6159455D-2D12-4FA3-B5B1-F10E80E60747} = {BE890223-2D43-41C5-9657-497769E167CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A77C9AC-0CF7-4769-B259-C43A7A53A59D}
