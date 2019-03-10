@@ -1,0 +1,9 @@
+# build docker container
+docker build -t artemkv/ref-watches-net:latest .
+docker push artemkv/ref-watches-net:latest
+
+# update images
+docker pull artemkv/ref-watches-net:latest
+
+# stats
+docker run -d -p 8500:80 --env CONNECTIONSTRINGS__DEFAULTCONNECTION="Data Source=192.168.1.7;Initial Catalog=Watches;User Id=watches;Password=watch123;" artemkv/ref-watches-net:latest
