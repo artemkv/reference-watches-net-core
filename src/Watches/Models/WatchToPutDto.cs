@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Watches.Entities;
 
-namespace Watches.ViewModels
+namespace Watches.Models
 {
     public class WatchToPutDto
     {

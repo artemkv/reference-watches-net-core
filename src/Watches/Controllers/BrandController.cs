@@ -8,7 +8,7 @@ using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
 using Watches.Services;
-using Watches.ViewModels;
+using Watches.Models;
 
 namespace Watches.Controllers
 {

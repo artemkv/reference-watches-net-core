@@ -7,7 +7,7 @@ using Watches.Controllers;
 using Watches.Exceptions;
 using Watches.Entities;
 using Watches.Services;
-using Watches.ViewModels;
+using Watches.Models;
 using Xunit;
 
 namespace Watches.Tests

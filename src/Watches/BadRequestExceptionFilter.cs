@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using Watches.Exceptions;
-using Watches.ViewModels;
+using Watches.Models;
 
 namespace Watches
 {

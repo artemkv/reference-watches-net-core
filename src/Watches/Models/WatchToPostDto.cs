@@ -5,26 +5,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using Watches.Entities;
 
-namespace Watches.ViewModels
+namespace Watches.Models
 {
-    public class WatchDto
+    public class WatchToPostDto
     {
-        public long Id { get; set; }
-
+        [Required, MaxLength(255)]
         public string Model { get; set; }
 
+        [Required, MaxLength(255)]
         public string Title { get; set; }
 
+        [Required]
         public Gender Gender { get; set; }
 
+        [Required]
         public int CaseSize { get; set; }
 
+        [Required]
         public CaseMaterial CaseMaterial { get; set; }
 
-        public DateTime DateCreated { get; set; }
+        [Required]
+        public long BrandId { get; set; }
 
-        public BrandDto Brand { get; set; }
-
+        [Required]
         public long MovementId { get; set; }
     }
 }
