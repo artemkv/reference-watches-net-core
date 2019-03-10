@@ -9,6 +9,7 @@ using Watches.Entities;
 using Watches.Services;
 using Watches.Models;
 using Xunit;
+using System.Linq;
 
 namespace Watches.Tests
 {
@@ -88,7 +89,7 @@ namespace Watches.Tests
             Assert.Equal(expected.Count, listResponse.Count);
             Assert.Equal(expected.PageNumber, listResponse.PageNumber);
             Assert.Equal(expected.PageSize, listResponse.PageSize);
-            Assert.Equal(expected.Results.Count, listResponse.Results.Count);
+            Assert.Equal(expected.Results.Count(), listResponse.Results.Count());
         }
 
         [Fact]
@@ -114,7 +115,7 @@ namespace Watches.Tests
             Assert.Equal(expected.Count, listResponse.Count);
             Assert.Equal(expected.PageNumber, listResponse.PageNumber);
             Assert.Equal(expected.PageSize, listResponse.PageSize);
-            Assert.Equal(expected.Results.Count, listResponse.Results.Count);
+            Assert.Equal(expected.Results.Count(), listResponse.Results.Count());
         }
 
         [Fact]

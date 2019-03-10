@@ -15,6 +15,6 @@ namespace Watches.Models
 
         public int Count { get; set; }
 
-        public List<T> Results { get; set; }
+        public IEnumerable<T> Results { get; set; }
     }
 }
