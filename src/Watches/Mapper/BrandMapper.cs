@@ -41,5 +41,22 @@ namespace Watches.Mapper
                 DateCreated = DateTime.UtcNow
             };
         }
+
+        public static Brand ToBrand(this BrandToPutDto brand)
+        {
+            if (brand == null)
+            {
+                return null;
+            }
+
+            return new Brand
+            {
+                Id = brand.Id,
+                Title = brand.Title,
+                YearFounded = brand.YearFounded,
+                Description = brand.Description,
+                DateCreated = DateTime.UtcNow
+            };
+        }
     }
 }

@@ -71,21 +71,25 @@ namespace Watches.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BrandDto>> CreateBrandAsync(BrandToPostDto brand)
+        public async Task<ActionResult<BrandDto>> CreateBrandAsync(BrandToPostDto brandDto)
         {
-            var created = await _brandService.CreateBrandAsync(brand.ToBrand());
+            var created = await _brandService.CreateBrandAsync(brandDto.ToBrand());
             return CreatedAtAction(nameof(GetBrandAsync), new { id = created.Id }, created.ToBrandDto());
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBrandAsync(long id, BrandToPutDto brand)
+        public async Task<IActionResult> UpdateBrandAsync(long id, BrandToPutDto brandDto)
         {
-            if (id != brand.Id)
+            if (id != brandDto.Id)
             {
-                throw new BadRequestException($"Brand id {brand.Id} does not match the id in the route: {id}.", "id");
+                throw new BadRequestException($"Brand id {brandDto.Id} does not match the id in the route: {id}.", "id");
+            }
+            if (brandDto.Id == default(long))
+            {
+                throw new BadRequestException($"Brand id cannot be 0.", "id");
             }
 
-            var updated = await _brandService.UpdateBrandAsync(brand.Id, brand.Title, brand.YearFounded, brand.Description);
+            var updated = await _brandService.UpdateBrandAsync(brandDto.ToBrand());
             if (!updated)
             {
                 return NotFound($"Brand with id {id} cannot be found.");
