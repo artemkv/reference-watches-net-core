@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Watches.Models
+namespace Watches.Entities
 {
     public enum CaseMaterial
     {

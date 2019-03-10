@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
-using Watches.Models;
+using Watches.Entities;
 using Watches.Services;
 using Watches.ViewModels;
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Watches.Controllers;
 using Watches.Exceptions;
-using Watches.Models;
+using Watches.Entities;
 using Watches.Services;
 using Watches.ViewModels;
 using Xunit;
