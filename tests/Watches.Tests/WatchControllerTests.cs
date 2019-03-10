@@ -156,7 +156,7 @@ namespace Watches.Tests
         {
             // Arrange
             var watchToPost = GetWatchToPost();
-            var watchPosted = GetWatchPosted();
+            var watchPosted = GetWatchCreatedOrUpdated();
             var mockWatchService = new Mock<IWatchService>();
             mockWatchService.Setup(svc => svc.CreateWatchAsync(
                 It.Is<Watch>(
@@ -177,6 +177,7 @@ namespace Watches.Tests
             // Assert
             var result = Assert.IsType<ActionResult<WatchDto>>(response);
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(response.Result);
+            Assert.Equal(watchPosted.Id, createdAtActionResult.RouteValues["id"]);
             var model = Assert.IsAssignableFrom<WatchDto>(createdAtActionResult.Value);
             Assert.Equal(watchPosted.Id, model.Id);
             Assert.Equal(watchPosted.Model, model.Model);
@@ -188,10 +189,18 @@ namespace Watches.Tests
         {
             // Arrange
             var watchToPut = GetWatchToPut();
+            var watchUpdated = GetWatchCreatedOrUpdated();
             var mockWatchService = new Mock<IWatchService>();
             mockWatchService.Setup(svc => svc.UpdateWatchAsync(
-                watchToPut.Id, watchToPut.Model, watchToPut.Title, watchToPut.Gender, watchToPut.CaseSize,
-                watchToPut.CaseMaterial, watchToPut.BrandId, watchToPut.MovementId)).ReturnsAsync(true);
+                It.Is<Watch>(
+                    x => x.Id.Equals(watchToPut.Id) &&
+                    x.Model.Equals(watchToPut.Model) &&
+                    x.Title.Equals(watchToPut.Title) &&
+                    x.Gender.Equals(watchToPut.Gender) &&
+                    x.CaseSize.Equals(watchToPut.CaseSize) &&
+                    x.CaseMaterial.Equals(watchToPut.CaseMaterial) &&
+                    x.BrandId.Equals(watchToPut.BrandId) &&
+                    x.MovementId.Equals(watchToPut.MovementId)))).ReturnsAsync(true);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
 
@@ -207,10 +216,9 @@ namespace Watches.Tests
         {
             // Arrange
             var watchToPut = GetWatchToPut();
+            var watchUpdated = GetWatchCreatedOrUpdated();
             var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.UpdateWatchAsync(
-                watchToPut.Id, watchToPut.Model, watchToPut.Title, watchToPut.Gender, watchToPut.CaseSize,
-                watchToPut.CaseMaterial, watchToPut.BrandId, watchToPut.MovementId))
+            mockWatchService.Setup(svc => svc.UpdateWatchAsync(It.IsAny<Watch>()))
                 .ReturnsAsync(false).Verifiable();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
@@ -222,6 +230,25 @@ namespace Watches.Tests
             mockWatchService.Verify();
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
             Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateWatch_ReturnsNotFound_ForEmptyId()
+        {
+            // Arrange
+            var watchToPut = GetWatchToPut();
+            watchToPut.Id = 0;
+            var mockWatchService = new Mock<IWatchService>();
+            var mockApiConfiguration = new Mock<IApiConfiguration>();
+            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+
+            // Act
+            var ex = await Assert.ThrowsAsync<BadRequestException>(
+                () => controller.UpdateWatchAsync(0, watchToPut));
+
+            // Assert
+            Assert.Equal("id", ex.Key);
+            Assert.Equal("Watch id cannot be 0.", ex.Message);
         }
 
         [Fact]
@@ -341,7 +368,7 @@ namespace Watches.Tests
             };
         }
 
-        private Watch GetWatchPosted()
+        private Watch GetWatchCreatedOrUpdated()
         {
             return new Watch
             {

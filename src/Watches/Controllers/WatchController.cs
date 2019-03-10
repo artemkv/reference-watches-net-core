@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
@@ -87,10 +85,12 @@ namespace Watches.Controllers
             {
                 throw new BadRequestException($"Watch id {watch.Id} does not match the id in the route: {id}.", "id");
             }
+            if (watch.Id == default(long))
+            {
+                throw new BadRequestException($"Watch id cannot be 0.", "id");
+            }
 
-            var updated = await _watchService.UpdateWatchAsync(
-                watch.Id, watch.Model, watch.Title, watch.Gender, watch.CaseSize,
-                watch.CaseMaterial, watch.BrandId, watch.MovementId);
+            var updated = await _watchService.UpdateWatchAsync(watch.ToWatch());
             if (!updated)
             {
                 return NotFound($"Watch with id {id} cannot be found.");
