@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Watches.Controllers;
 using Watches.Exceptions;
 using Watches.Entities;
-using Watches.Services;
+using Watches.Repositories;
 using Watches.Models;
 using Xunit;
 using System.Linq;
@@ -22,10 +22,10 @@ namespace Watches.Tests
             var today = DateTime.UtcNow;
             var expected = GetSingleWatch(today);
 
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.GetWatchAsync(5)).ReturnsAsync(expected);
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.GetWatchAsync(5)).ReturnsAsync(expected);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.GetWatchAsync(5);
@@ -52,10 +52,10 @@ namespace Watches.Tests
         public async Task GetWatch_ReturnsNotFound_ForInvalidId()
         {
             // Arrange
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.GetWatchAsync(55)).ReturnsAsync((Watch)null);
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.GetWatchAsync(55)).ReturnsAsync((Watch)null);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.GetWatchAsync(55);
@@ -67,17 +67,17 @@ namespace Watches.Tests
         }
 
         [Fact]
-        public async Task GetWatches_CallsWatchServiceWithDefaultValues()
+        public async Task GetWatches_CallsWatchRepositoryWithDefaultValues()
         {
             // Arrange
             var expected = GetWatches();
 
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.GetWatchesAsync("", null, null, 0, 20)).ReturnsAsync(expected);
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.GetWatchesAsync("", null, null, 0, 20)).ReturnsAsync(expected);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(100);
             mockApiConfiguration.Setup(config => config.ApiDefaultPageSize).Returns(20);
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.GetWatchesAsync();
@@ -93,17 +93,17 @@ namespace Watches.Tests
         }
 
         [Fact]
-        public async Task GetWatches_CallsWatchServiceWithCorrectFilters()
+        public async Task GetWatches_CallsWatchRepositoryWithCorrectFilters()
         {
             // Arrange
             var expected = GetWatches();
 
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80)).ReturnsAsync(expected);
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80)).ReturnsAsync(expected);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(100);
             mockApiConfiguration.Setup(config => config.ApiDefaultPageSize).Returns(20);
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80);
@@ -122,10 +122,10 @@ namespace Watches.Tests
         public async Task GetWatches_ThrowsBadRequest_ForInvalidPageNumber()
         {
             // Arrange
-            var mockWatchService = new Mock<IWatchService>();
+            var mockWatchRepository = new Mock<IWatchRepository>();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(10);
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var ex = await Assert.ThrowsAsync<BadRequestException>(() => controller.GetWatchesAsync(pageNumber: -1));
@@ -139,10 +139,10 @@ namespace Watches.Tests
         public async Task GetWatches_ThrowsBadRequest_ForInvalidPageSize()
         {
             // Arrange
-            var mockWatchService = new Mock<IWatchService>();
+            var mockWatchRepository = new Mock<IWatchRepository>();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(10);
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var ex = await Assert.ThrowsAsync<BadRequestException>(() => controller.GetWatchesAsync(pageSize: 11));
@@ -158,8 +158,8 @@ namespace Watches.Tests
             // Arrange
             var watchToPost = GetWatchToPost();
             var watchPosted = GetWatchCreatedOrUpdated();
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.CreateWatchAsync(
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.CreateWatchAsync(
                 It.Is<Watch>(
                     x => x.Id == 0 && 
                     x.Model.Equals(watchToPost.Model) &&
@@ -170,7 +170,7 @@ namespace Watches.Tests
                     x.BrandId.Equals(watchToPost.BrandId) &&
                     x.MovementId.Equals(watchToPost.MovementId)))).ReturnsAsync(watchPosted);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.CreateWatchAsync(watchToPost);
@@ -191,8 +191,8 @@ namespace Watches.Tests
             // Arrange
             var watchToPut = GetWatchToPut();
             var watchUpdated = GetWatchCreatedOrUpdated();
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.UpdateWatchAsync(
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.UpdateWatchAsync(
                 It.Is<Watch>(
                     x => x.Id.Equals(watchToPut.Id) &&
                     x.Model.Equals(watchToPut.Model) &&
@@ -203,7 +203,7 @@ namespace Watches.Tests
                     x.BrandId.Equals(watchToPut.BrandId) &&
                     x.MovementId.Equals(watchToPut.MovementId)))).ReturnsAsync(true);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.UpdateWatchAsync(watchToPut.Id, watchToPut);
@@ -218,17 +218,17 @@ namespace Watches.Tests
             // Arrange
             var watchToPut = GetWatchToPut();
             var watchUpdated = GetWatchCreatedOrUpdated();
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.UpdateWatchAsync(It.IsAny<Watch>()))
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.UpdateWatchAsync(It.IsAny<Watch>()))
                 .ReturnsAsync(false).Verifiable();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.UpdateWatchAsync(watchToPut.Id, watchToPut);
 
             // Assert
-            mockWatchService.Verify();
+            mockWatchRepository.Verify();
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
             Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
         }
@@ -239,9 +239,9 @@ namespace Watches.Tests
             // Arrange
             var watchToPut = GetWatchToPut();
             watchToPut.Id = 0;
-            var mockWatchService = new Mock<IWatchService>();
+            var mockWatchRepository = new Mock<IWatchRepository>();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var ex = await Assert.ThrowsAsync<BadRequestException>(
@@ -257,9 +257,9 @@ namespace Watches.Tests
         {
             // Arrange
             var watchToPut = GetWatchToPut();
-            var mockWatchService = new Mock<IWatchService>();
+            var mockWatchRepository = new Mock<IWatchRepository>();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var ex = await Assert.ThrowsAsync<BadRequestException>(
@@ -274,10 +274,10 @@ namespace Watches.Tests
         public async Task DeleteWatch_DeletesWatch()
         {
             // Arrange
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(true);
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(true);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.DeleteWatchAsync(15);
@@ -290,16 +290,16 @@ namespace Watches.Tests
         public async Task DeleteWatch_ReturnsNotFound_ForInvalidId()
         {
             // Arrange
-            var mockWatchService = new Mock<IWatchService>();
-            mockWatchService.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(false).Verifiable();
+            var mockWatchRepository = new Mock<IWatchRepository>();
+            mockWatchRepository.Setup(svc => svc.DeleteWatchAsync(15)).ReturnsAsync(false).Verifiable();
             var mockApiConfiguration = new Mock<IApiConfiguration>();
-            var controller = new WatchController(mockWatchService.Object, mockApiConfiguration.Object);
+            var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
             var response = await controller.DeleteWatchAsync(15);
 
             // Assert
-            mockWatchService.Verify();
+            mockWatchRepository.Verify();
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(response);
             Assert.Equal("Watch with id 15 cannot be found.", notFoundObjectResult.Value);
         }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Watches.Entities;
 
-namespace Watches.Services
+namespace Watches.Repositories
 {
-    public interface IBrandService
+    public interface IBrandRepository
     {
         Task<ResultsPage<Brand>> GetBrandsAsync(int pageNumber, int pageSize);
         Task<Brand> GetBrandAsync(long id);

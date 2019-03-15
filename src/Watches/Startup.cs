@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Watches.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Watches.Services;
+using Watches.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Watches
@@ -33,8 +33,8 @@ namespace Watches
             {
                 options.Filters.Add(typeof(BadRequestExceptionFilter));
             }).AddXmlSerializerFormatters(); // Allows Xml formatting as well as Json, using content negotiation
-            services.AddScoped<IWatchService, WatchService>();
-            services.AddScoped<IBrandService, BrandService>();
+            services.AddScoped<IWatchRepository, WatchRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
             services.AddScoped<IApiConfiguration, ApiConfiguration>();
         }
 

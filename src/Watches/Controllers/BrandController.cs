@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
-using Watches.Services;
+using Watches.Repositories;
 using Watches.Models;
 
 namespace Watches.Controllers
@@ -16,21 +16,12 @@ namespace Watches.Controllers
     [ApiController]
     public class BrandController : ControllerBase
     {
-        private IBrandService _brandService;
+        private IBrandRepository _brandRepository;
         private IApiConfiguration _config;
 
-        public BrandController(IBrandService brandService, IApiConfiguration config)
+        public BrandController(IBrandRepository brandRepository, IApiConfiguration config)
         {
-            if (brandService == null)
-            {
-                throw new ArgumentNullException("brandService");
-            }
-            if (config == null)
-            {
-                throw new ArgumentNullException("config");
-            }
-
-            _brandService = brandService;
+            _brandRepository = brandRepository;
             _config = config;
         }
 
@@ -47,7 +38,7 @@ namespace Watches.Controllers
             PagingValidationHelper.ValidatePageNumber(pageNumber);
             PagingValidationHelper.ValidatePageSize((int)pageSize, _config.ApiPageSizeLimit);
 
-            var brandsPage = await _brandService.GetBrandsAsync(pageNumber, (int)pageSize);
+            var brandsPage = await _brandRepository.GetBrandsAsync(pageNumber, (int)pageSize);
 
             return new GetListResponse<BrandDto>
             {
@@ -62,7 +53,7 @@ namespace Watches.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BrandDto>> GetBrandAsync(long id)
         {
-            var brand = await _brandService.GetBrandAsync(id);
+            var brand = await _brandRepository.GetBrandAsync(id);
             if (brand == null)
             {
                 return NotFound($"Brand with id {id} cannot be found.");
@@ -73,7 +64,7 @@ namespace Watches.Controllers
         [HttpPost]
         public async Task<ActionResult<BrandDto>> CreateBrandAsync(BrandToPostDto brandDto)
         {
-            var created = await _brandService.CreateBrandAsync(brandDto.ToBrand());
+            var created = await _brandRepository.CreateBrandAsync(brandDto.ToBrand());
             return CreatedAtAction(nameof(GetBrandAsync), new { id = created.Id }, created.ToBrandDto());
         }
 
@@ -89,7 +80,7 @@ namespace Watches.Controllers
                 throw new BadRequestException($"Brand id cannot be 0.", "id");
             }
 
-            var updated = await _brandService.UpdateBrandAsync(brandDto.ToBrand());
+            var updated = await _brandRepository.UpdateBrandAsync(brandDto.ToBrand());
             if (!updated)
             {
                 return NotFound($"Brand with id {id} cannot be found.");
@@ -100,7 +91,7 @@ namespace Watches.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBrandAsync(long id)
         {
-            var removed = await _brandService.DeleteBrandAsync(id);
+            var removed = await _brandRepository.DeleteBrandAsync(id);
             if (!removed)
             {
                 return NotFound($"Brand with id {id} cannot be found.");

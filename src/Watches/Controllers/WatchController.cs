@@ -6,7 +6,7 @@ using Watches.Controllers.Helpers;
 using Watches.Exceptions;
 using Watches.Mapper;
 using Watches.Entities;
-using Watches.Services;
+using Watches.Repositories;
 using Watches.Models;
 
 namespace Watches.Controllers
@@ -15,21 +15,12 @@ namespace Watches.Controllers
     [ApiController]
     public class WatchController : Controller
     {
-        private IWatchService _watchService;
+        private IWatchRepository _watchRepository;
         private IApiConfiguration _config;
 
-        public WatchController(IWatchService watchService, IApiConfiguration config)
+        public WatchController(IWatchRepository watchRepository, IApiConfiguration config)
         {
-            if (watchService == null)
-            {
-                throw new ArgumentNullException("watchService");
-            }
-            if (config == null)
-            {
-                throw new ArgumentNullException("config");
-            }
-
-            _watchService = watchService;
+            _watchRepository = watchRepository;
             _config = config;
         }
 
@@ -49,7 +40,7 @@ namespace Watches.Controllers
             PagingValidationHelper.ValidatePageNumber(pageNumber);
             PagingValidationHelper.ValidatePageSize((int)pageSize, _config.ApiPageSizeLimit);
 
-            var watchesPage = await _watchService.GetWatchesAsync(title, gender, brandId, pageNumber, (int)pageSize);
+            var watchesPage = await _watchRepository.GetWatchesAsync(title, gender, brandId, pageNumber, (int)pageSize);
             return new GetListResponse<WatchDto>
             {
                 PageNumber = watchesPage.PageNumber,
@@ -63,7 +54,7 @@ namespace Watches.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WatchDto>> GetWatchAsync(long id)
         {
-            var watch = await _watchService.GetWatchAsync(id);
+            var watch = await _watchRepository.GetWatchAsync(id);
             if (watch == null)
             {
                 return NotFound($"Watch with id {id} cannot be found.");
@@ -74,7 +65,7 @@ namespace Watches.Controllers
         [HttpPost]
         public async Task<ActionResult<WatchDto>> CreateWatchAsync(WatchToPostDto watchDto)
         {
-            var created = await _watchService.CreateWatchAsync(watchDto.ToWatch());
+            var created = await _watchRepository.CreateWatchAsync(watchDto.ToWatch());
             return CreatedAtAction(nameof(GetWatchAsync), new { id = created.Id }, created.ToWatchDto());
         }
 
@@ -90,7 +81,7 @@ namespace Watches.Controllers
                 throw new BadRequestException($"Watch id cannot be 0.", "id");
             }
 
-            var updated = await _watchService.UpdateWatchAsync(watchDto.ToWatch());
+            var updated = await _watchRepository.UpdateWatchAsync(watchDto.ToWatch());
             if (!updated)
             {
                 return NotFound($"Watch with id {id} cannot be found.");
@@ -101,7 +92,7 @@ namespace Watches.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWatchAsync(long id)
         {
-            var removed = await _watchService.DeleteWatchAsync(id);
+            var removed = await _watchRepository.DeleteWatchAsync(id);
             if (!removed)
             {
                 return NotFound($"Watch with id {id} cannot be found.");

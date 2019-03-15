@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Watches.Entities;
 
-namespace Watches.Services
+namespace Watches.Repositories
 {
-    public interface IWatchService
+    public interface IWatchRepository
     {
         Task<ResultsPage<Watch>> GetWatchesAsync(
             string title, Gender? gender, long? brandId, int pageNumber, int pageSize);
