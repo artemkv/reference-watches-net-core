@@ -13,8 +13,10 @@ namespace Watches.Entities
         [Key]
         public long Id { get; set; }
 
-        [Timestamp]
-        public byte[] Ts { get; set; }
+// TODO: when this timestamp is present, it is used to detect conflicts, but for now we don't allow clients to pass it
+// and we don't return it neither
+//        [Timestamp]
+//        public byte[] Ts { get; set; }
 
         [Required, MaxLength(255)]
         public string Title { get; set; }
