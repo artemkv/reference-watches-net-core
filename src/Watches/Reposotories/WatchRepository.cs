@@ -18,12 +18,12 @@ namespace Watches.Repositories
         }
 
         public async Task<ResultsPage<Watch>> GetWatchesAsync(
-            string title, Gender? gender, long? brandId, int pageNumber, int pageSize)
+            string title, Gender? gender, string brandTitle, int pageNumber, int pageSize)
         {
             var query = _dbContext.Watches
                 .Where(watch => String.IsNullOrEmpty(title) || watch.Title.Contains(title))
                 .Where(watch => gender == null || watch.Gender == gender)
-                .Where(watch => brandId == null || watch.BrandId == brandId)
+                .Where(watch => String.IsNullOrEmpty(brandTitle) || watch.Brand.Title.Contains(brandTitle))
                 .Include(watch => watch.Brand);
 
             int total = await query.CountAsync();

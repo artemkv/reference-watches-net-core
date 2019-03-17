@@ -9,7 +9,7 @@ namespace Watches.Repositories
     public interface IWatchRepository
     {
         Task<ResultsPage<Watch>> GetWatchesAsync(
-            string title, Gender? gender, long? brandId, int pageNumber, int pageSize);
+            string title, Gender? gender, string brandTitle, int pageNumber, int pageSize);
         Task<Watch> GetWatchAsync(long id);
         Task<Watch> CreateWatchAsync(Watch watch);
         Task<bool> UpdateWatchAsync(Watch watch);

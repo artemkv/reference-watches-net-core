@@ -73,7 +73,7 @@ namespace Watches.Tests
             var expected = GetWatches();
 
             var mockWatchRepository = new Mock<IWatchRepository>();
-            mockWatchRepository.Setup(svc => svc.GetWatchesAsync("", null, null, 0, 20)).ReturnsAsync(expected);
+            mockWatchRepository.Setup(svc => svc.GetWatchesAsync(null, null, null, 0, 20)).ReturnsAsync(expected);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(100);
             mockApiConfiguration.Setup(config => config.ApiDefaultPageSize).Returns(20);
@@ -99,14 +99,14 @@ namespace Watches.Tests
             var expected = GetWatches();
 
             var mockWatchRepository = new Mock<IWatchRepository>();
-            mockWatchRepository.Setup(svc => svc.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80)).ReturnsAsync(expected);
+            mockWatchRepository.Setup(svc => svc.GetWatchesAsync("t1", Gender.Mens, "bt1", 3, 80)).ReturnsAsync(expected);
             var mockApiConfiguration = new Mock<IApiConfiguration>();
             mockApiConfiguration.Setup(config => config.ApiPageSizeLimit).Returns(100);
             mockApiConfiguration.Setup(config => config.ApiDefaultPageSize).Returns(20);
             var controller = new WatchController(mockWatchRepository.Object, mockApiConfiguration.Object);
 
             // Act
-            var response = await controller.GetWatchesAsync("t1", Gender.Mens, 123, 3, 80);
+            var response = await controller.GetWatchesAsync("t1", Gender.Mens, "bt1", 3, 80);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<GetListResponse<WatchDto>>>(response);

@@ -26,9 +26,9 @@ namespace Watches.Controllers
 
         [HttpGet]
         public async Task<ActionResult<GetListResponse<WatchDto>>> GetWatchesAsync(
-            [FromQuery] string title = "",
+            [FromQuery] string title = null,
             [FromQuery] Gender? gender = null,
-            [FromQuery] long? brandId = null,
+            [FromQuery] string brandTitle = null,
             [FromQuery] int pageNumber = 0,
             [FromQuery] int? pageSize = null)
         {
@@ -40,7 +40,7 @@ namespace Watches.Controllers
             PagingValidationHelper.ValidatePageNumber(pageNumber);
             PagingValidationHelper.ValidatePageSize((int)pageSize, _config.ApiPageSizeLimit);
 
-            var watchesPage = await _watchRepository.GetWatchesAsync(title, gender, brandId, pageNumber, (int)pageSize);
+            var watchesPage = await _watchRepository.GetWatchesAsync(title, gender, brandTitle, pageNumber, (int)pageSize);
             return new GetListResponse<WatchDto>
             {
                 PageNumber = watchesPage.PageNumber,
