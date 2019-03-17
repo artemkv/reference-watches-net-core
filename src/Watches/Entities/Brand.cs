@@ -28,7 +28,7 @@ namespace Watches.Entities
         public string Description { get; set; }
 
         [Required]
-        public DateTime DateCreated { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         public ICollection<Watch> Watches { get; set; }
     }

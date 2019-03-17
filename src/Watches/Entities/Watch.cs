@@ -34,7 +34,7 @@ namespace Watches.Entities
         public CaseMaterial CaseMaterial { get; set; }
 
         [Required]
-        public DateTime DateCreated { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         [Required]
         public Brand Brand { get; set; }

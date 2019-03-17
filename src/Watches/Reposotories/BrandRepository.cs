@@ -63,6 +63,7 @@ namespace Watches.Repositories
                 throw new InvalidOperationException("Id of existing entity should be provided.");
             }
             _dbContext.Entry(brand).State = EntityState.Modified;
+            _dbContext.Entry(brand).Property(x => x.DateCreated).IsModified = false;
             try
             {
                 await _dbContext.SaveChangesAsync();

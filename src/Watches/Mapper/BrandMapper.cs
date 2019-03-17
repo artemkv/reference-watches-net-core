@@ -37,8 +37,7 @@ namespace Watches.Mapper
             {
                 Title = brand.Title,
                 YearFounded = brand.YearFounded,
-                Description = brand.Description,
-                DateCreated = DateTime.UtcNow
+                Description = brand.Description
             };
         }
 
@@ -54,8 +53,7 @@ namespace Watches.Mapper
                 Id = brand.Id,
                 Title = brand.Title,
                 YearFounded = brand.YearFounded,
-                Description = brand.Description,
-                DateCreated = DateTime.UtcNow
+                Description = brand.Description
             };
         }
     }

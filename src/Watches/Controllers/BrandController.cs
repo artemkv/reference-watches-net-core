@@ -14,7 +14,7 @@ namespace Watches.Controllers
 {
     [Route("api/brands")]
     [ApiController]
-    public class BrandController : ControllerBase
+    public class BrandController : Controller
     {
         private IBrandRepository _brandRepository;
         private IApiConfiguration _config;

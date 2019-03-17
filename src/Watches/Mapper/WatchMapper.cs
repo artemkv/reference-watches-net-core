@@ -44,7 +44,6 @@ namespace Watches.Mapper
                 Gender = watch.Gender,
                 CaseSize = watch.CaseSize,
                 CaseMaterial = watch.CaseMaterial,
-                DateCreated = DateTime.UtcNow,
                 BrandId = watch.BrandId,
                 MovementId = watch.MovementId
             };
@@ -65,7 +64,6 @@ namespace Watches.Mapper
                 Gender = watch.Gender,
                 CaseSize = watch.CaseSize,
                 CaseMaterial = watch.CaseMaterial,
-                DateCreated = DateTime.UtcNow,
                 BrandId = watch.BrandId,
                 MovementId = watch.MovementId
             };
